@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>NIGHTMARES Music v3.0</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <div id="ver-banner" class="ver-banner">
+    v3.0.1 — Résultats illimités · API pour bot · Paramètres
+  </div>
+  <div id="file-banner" class="file-banner" hidden>
+    ⚠️ N’ouvre pas ce fichier directement.<br/>
+    Lance <b>python server.py</b> puis ouvre
+    <b>http://127.0.0.1:8765</b>
+  </div>
+
+  <aside id="lyrics-panel" class="lyrics-panel" hidden aria-live="polite">
+    <div class="lyrics-head">
+      <div class="lyrics-meta">
+        <strong id="lyrics-title">Paroles</strong>
+        <span id="lyrics-artist"></span>
+      </div>
+      <div class="lyrics-actions">
+        <button type="button" id="lyrics-pin" class="lyrics-btn" title="Épingler">📌</button>
+        <button type="button" id="lyrics-close" class="lyrics-btn" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div id="lyrics-body" class="lyrics-body">Chargement…</div>
+  </aside>
+
+  <div id="app">
+    <header class="header">
+      <div class="brand">
+        <span class="logo">♪</span>
+        <div>
+          <h1>NIGHTMARES <span>Music</span></h1>
+          <p class="tag">v3.0 · API · illimité</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="btn-lib" class="icon-btn" title="Téléchargements">⬇</button>
+        <button type="button" id="btn-settings" class="icon-btn" title="Paramètres">⚙</button>
+        <button type="button" id="btn-theme" class="icon-btn" title="Thème">◐</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button type="button" class="tab active" data-tab="search">Recherche</button>
+      <button type="button" class="tab" data-tab="library">Téléchargements</button>
+      <button type="button" class="tab" data-tab="settings">Paramètres</button>
+    </nav>
+
+    <!-- SEARCH -->
+    <section id="tab-search" class="tab-panel">
+      <section class="search-panel">
+        <form id="search-form" autocomplete="off">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input id="query" type="search" placeholder="Artiste ou titre… (ex: Damso, Booba)" maxlength="120" required />
+            <button type="submit" id="btn-search">Rechercher</button>
+          </div>
+          <div class="search-options">
+            <label class="check">
+              <input type="checkbox" id="artist-mode" />
+              Discographie artiste (tous les titres)
+            </label>
+            <label class="limit-label">
+              Max résultats
+              <select id="limit-select">
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200" selected>200</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+              </select>
+            </label>
+          </div>
+        </form>
+        <div id="status" class="status" data-type="normal"></div>
+      </section>
+      <section class="results-meta" id="results-meta" hidden>
+        <span id="results-count"></span>
+        <div class="filters">
+          <button type="button" class="chip active" data-sort="pop">Popularité</button>
+          <button type="button" class="chip" data-sort="name">Nom</button>
+          <button type="button" class="chip" data-sort="artist">Artiste</button>
+        </div>
+      </section>
+      <main id="results" class="results"></main>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="tab-library" class="tab-panel" hidden>
+      <div class="lib-head">
+        <h2>Mes téléchargements</h2>
+        <button type="button" id="btn-clear-lib" class="btn btn-play">Vider</button>
+      </div>
+      <p class="lib-hint">Titres téléchargés (MP3 complets).</p>
+      <main id="library" class="results"></main>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="tab-settings" class="tab-panel" hidden>
+      <div class="settings-wrap">
+        <h2>⚙ Paramètres</h2>
+
+        <div class="settings-card">
+          <h3>Connexion serveur</h3>
+          <div class="kv" id="conn-status">
+            <div><span class="k">Statut</span><span class="v" id="st-status">…</span></div>
+            <div><span class="k">Version</span><span class="v" id="st-version">…</span></div>
+            <div><span class="k">yt-dlp</span><span class="v" id="st-ytdlp">…</span></div>
+            <div><span class="k">ffmpeg</span><span class="v" id="st-ffmpeg">…</span></div>
+            <div><span class="k">URL locale</span><span class="v">http://127.0.0.1:8765</span></div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>🔑 Clés API (pour ton bot WhatsApp)</h3>
+          <p class="hint">Crée une clé, puis utilise-la dans ton bot avec le header <code>X-API-Key</code>.</p>
+          <div class="api-create">
+            <input type="text" id="key-name" placeholder="Nom (ex: bot-whatsapp)" maxlength="40" />
+            <button type="button" id="btn-create-key" class="btn btn-dl">Créer une clé API</button>
+          </div>
+          <div id="new-key-box" class="new-key-box" hidden>
+            <p>⚠️ Copie cette clé maintenant — elle ne sera plus affichée en entier ailleurs :</p>
+            <code id="new-key-value"></code>
+            <button type="button" id="btn-copy-key" class="btn btn-play">Copier</button>
+          </div>
+          <div id="keys-list" class="keys-list"></div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Documentation API bot</h3>
+          <div class="api-docs">
+            <p><strong>Base URL</strong> : <code id="api-base">http://127.0.0.1:8765</code></p>
+            <p>Header obligatoire : <code>X-API-Key: ta_cle</code></p>
+            <pre class="code-block"># Recherche
+GET /api/v1/search?q=Damso&amp;limit=100&amp;artist=1
+
+# Télécharger MP3 (fichier)
+GET /api/v1/download?q=Damso+Macarena&amp;title=Macarena&amp;artist=Damso&amp;format=file
+
+# Paroles
+GET /api/v1/lyrics?artist=Damso&amp;title=Macarena
+
+# Ping
+GET /api/v1/ping</pre>
+            <p class="hint">Exemple Node.js (bot) :</p>
+            <pre class="code-block">const res = await fetch(BASE + "/api/v1/download?q=" + encodeURIComponent(q)
+  + "&amp;title=" + encodeURIComponent(title)
+  + "&amp;artist=" + encodeURIComponent(artist)
+  + "&amp;format=file", {
+  headers: { "X-API-Key": process.env.NM_API_KEY }
+});
+const buf = Buffer.from(await res.arrayBuffer());
+// envoie buf en audio WhatsApp</pre>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Options</h3>
+          <label class="check">
+            <input type="checkbox" id="opt-require-key" checked />
+            Exiger une clé API pour /api/v1/*
+          </label>
+          <label class="limit-label" style="margin-top:10px;display:block">
+            Max résultats par défaut
+            <select id="opt-max-results">
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="500">500</option>
+              <option value="1000">1000</option>
+            </select>
+          </label>
+          <button type="button" id="btn-save-settings" class="btn btn-play" style="margin-top:12px">Enregistrer</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Écouter = complet · Télécharger = MP3 · API v1 pour bot</span>
+    </footer>
+  </div>
+
+  <div id="player" class="player" hidden>
+    <img id="player-art" class="player-art" alt="" />
+    <div class="player-info">
+      <div id="player-title" class="player-title">—</div>
+      <div id="player-artist" class="player-artist">—</div>
+    </div>
+    <audio id="audio" controls preload="metadata"></audio>
+    <button type="button" id="player-close" class="icon-btn">✕</button>
+  </div>
+
+  <script src="js/app.js?v=3.0.1"></script>
+</body>
+</html>
